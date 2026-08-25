@@ -41,9 +41,7 @@
     padding:18px;
     box-shadow:0 3px 16px rgba(0,0,0,.07);
   }
-  .field{
-    margin-bottom:16px;
-  }
+  .field{ margin-bottom:16px; }
   label{
     display:block;
     font-weight:700;
@@ -102,12 +100,6 @@
     color:var(--sub);
     margin-left:5px;
   }
-  .formula{
-    margin-top:16px;
-    font-size:12px;
-    color:var(--sub);
-    line-height:1.6;
-  }
   button{
     width:100%;
     margin-top:16px;
@@ -130,7 +122,7 @@
     <div class="field">
       <label for="qty">生産数</label>
       <div class="inputrow">
-        <input id="qty" type="number" inputmode="decimal" min="0" step="1" value="291">
+        <input id="qty" type="number" inputmode="decimal" min="0" step="1" placeholder="例：400">
         <span class="unit">個</span>
       </div>
     </div>
@@ -138,7 +130,7 @@
     <div class="field">
       <label for="minutes">所要時間</label>
       <div class="inputrow">
-        <input id="minutes" type="number" inputmode="decimal" min="0" step="0.1" value="540">
+        <input id="minutes" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例：460">
         <span class="unit">分</span>
       </div>
     </div>
@@ -146,7 +138,7 @@
     <div class="field">
       <label for="people">人員</label>
       <div class="inputrow">
-        <input id="people" type="number" inputmode="decimal" min="0" step="0.1" value="1">
+        <input id="people" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例：1">
         <span class="unit">人</span>
       </div>
     </div>
@@ -154,21 +146,16 @@
     <div class="results">
       <div class="result">
         <div class="name">出来高</div>
-        <div class="value"><span id="output">32.3</span><span class="suffix">個/時</span></div>
+        <div class="value"><span id="output">－</span><span class="suffix">個/時</span></div>
       </div>
 
       <div class="result">
         <div class="name">個当り工数</div>
-        <div class="value"><span id="labor">111.3</span><span class="suffix">秒/個</span></div>
+        <div class="value"><span id="labor">－</span><span class="suffix">秒/個</span></div>
       </div>
     </div>
 
     <button id="clear" type="button">入力をクリア</button>
-
-    <div class="formula">
-      出来高 ＝ 生産数 ÷ 所要時間(分) × 60<br>
-      個当り工数 ＝ 所要時間(分) × 60 × 人員 ÷ 生産数
-    </div>
   </div>
 </div>
 
@@ -180,7 +167,7 @@ const output = document.getElementById('output');
 const labor = document.getElementById('labor');
 
 function fmt(n){
-  return Number.isFinite(n) ? n.toFixed(1) : "-";
+  return Number.isFinite(n) ? n.toFixed(1) : "－";
 }
 
 function calc(){
@@ -189,7 +176,7 @@ function calc(){
   const p = parseFloat(people.value);
 
   const out = (q > 0 && m > 0) ? q / m * 60 : NaN;
-  const lab = (q > 0 && m > 0 && p >= 0) ? m * 60 * p / q : NaN;
+  const lab = (q > 0 && m > 0 && p > 0) ? m * 60 * p / q : NaN;
 
   output.textContent = fmt(out);
   labor.textContent = fmt(lab);
@@ -200,7 +187,7 @@ function calc(){
 document.getElementById('clear').addEventListener('click', () => {
   qty.value = '';
   minutes.value = '';
-  people.value = '1';
+  people.value = '';
   calc();
   qty.focus();
 });
