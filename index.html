@@ -115,7 +115,7 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,118,210,.12)
 
 <script>
 const qty=document.getElementById('qty'),minutes=document.getElementById('minutes'),people=document.getElementById('people'),output=document.getElementById('output'),labor=document.getElementById('labor');
-function fmt(n){return Number.isFinite(n)?n.toFixed(1):"－";}
+function fmt(n){return Number.isFinite(n)?(Math.floor((n + Number.EPSILON) * 10) / 10).toFixed(1):"－";}
 function calc(){
   const q=parseFloat(qty.value),m=parseFloat(minutes.value),p=parseFloat(people.value);
   output.textContent=fmt((q>0&&m>0)?q/m*60:NaN);
