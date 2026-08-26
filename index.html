@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>生産出来高計算</title>
 <style>
 :root{
@@ -36,6 +36,14 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,118,210,.12)
 .result .value{font-size:30px;font-weight:800;letter-spacing:.3px}
 .result .suffix{font-size:14px;font-weight:500;color:var(--sub);margin-left:5px}
 #clear{width:100%;margin-top:16px;border:0;border-radius:10px;padding:12px;font-size:16px;font-weight:700;background:#e9edf2;color:#30343a}
+
+html, body, button, input {
+  touch-action: manipulation;
+}
+button, .calc-btn, .calc-toggle, #clear {
+  -webkit-tap-highlight-color: transparent;
+}
+
 </style>
 </head>
 <body>
@@ -152,6 +160,16 @@ document.querySelectorAll('.calc-btn').forEach(btn=>{
     if(value){calcExpr+=value;calcDisplay.textContent=calcExpr;}
   });
 });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault();
+  }
+  lastTouchEnd = now;
+}, { passive: false });
+
 calc();
 </script>
 </body>
