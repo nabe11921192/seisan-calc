@@ -297,6 +297,26 @@ body.pad-open{padding-bottom:500px}
   .field-row{grid-template-columns:1fr}
   .pad-btn{height:64px}
 }
+
+.time-muted {
+  color:#a7adb7 !important;
+  background:#f3f4f6 !important;
+}
+.helper-highlight {
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#eef6ff;
+  border:1px solid #cfe4ff;
+  color:#1769aa;
+  font-weight:800;
+  font-size:16px;
+}
+.helper-highlight strong {
+  font-size:22px;
+  margin-left:4px;
+}
+
 </style>
 </head>
 <body>
@@ -462,8 +482,17 @@ function calc(){
   const invalidStop = validM && validS && effective <= 0;
   timeError.classList.toggle('show', invalidStop);
 
+  const hasStop = stopMinutes.value !== '' && Number.isFinite(s) && s > 0;
+
+  minutes.classList.toggle('time-muted', hasStop);
+  effectiveTime.classList.toggle('helper-highlight', hasStop);
+
   if(Number.isFinite(effective) && effective > 0){
-    effectiveTime.textContent = '計算に使用する時間：' + trunc1(effective) + '分';
+    if(hasStop){
+      effectiveTime.innerHTML = '実稼働時間 <strong>' + Math.floor(effective) + '分</strong>';
+    }else{
+      effectiveTime.textContent = '計算に使用する時間：' + trunc1(effective) + '分';
+    }
   }else{
     effectiveTime.textContent = '計算に使用する時間：－';
   }
