@@ -6,50 +6,220 @@
 <title>生産出来高計算</title>
 <style>
 :root{
-  --bg:#f4f6f8; --card:#fff; --text:#15171a; --sub:#667085;
-  --line:#d9dee5; --accent:#1976d2; --result:#eef6ff;
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#15171a;
+  --sub:#667085;
+  --line:#d9dee5;
+  --accent:#1976d2;
+  --result:#eef6ff;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:520px;margin:0 auto;padding:24px 16px 40px}
-h1{font-size:24px;margin:0 0 6px}
-.note{color:var(--sub);font-size:13px;margin-bottom:18px}
-.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 3px 16px rgba(0,0,0,.07)}
-.calc-toggle{width:100%;margin:0 0 16px;border:0;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:800;background:#eaf3ff;color:#1769aa}
-.calculator{display:none;margin-bottom:20px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#f8fafc}
+html,body,button,input{touch-action:manipulation}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{
+  max-width:520px;
+  margin:0 auto;
+  padding:24px 16px 40px;
+}
+h1{
+  font-size:24px;
+  margin:0 0 6px;
+}
+.note{
+  color:var(--sub);
+  font-size:13px;
+  margin-bottom:18px;
+}
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 3px 16px rgba(0,0,0,.07);
+}
+.calc-toggle{
+  width:100%;
+  margin:0 0 16px;
+  border:0;
+  border-radius:12px;
+  padding:13px 16px;
+  font-size:16px;
+  font-weight:800;
+  background:#eaf3ff;
+  color:#1769aa;
+  -webkit-tap-highlight-color:transparent;
+}
+.calculator{
+  display:none;
+  margin-bottom:20px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#f8fafc;
+}
 .calculator.open{display:block}
-.calc-display{width:100%;font-size:28px;font-weight:700;text-align:right;padding:14px 12px;margin-bottom:10px;border:1px solid var(--line);border-radius:10px;background:#fff;min-height:64px;overflow:hidden}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.calc-btn{margin:0;padding:14px 0;font-size:19px;font-weight:700;border:1px solid var(--line);border-radius:10px;background:#fff;color:#222}
-.calc-btn.op{background:#eef6ff;color:#1769aa}
-.calc-btn.eq{background:#1976d2;color:#fff;border-color:#1976d2;grid-column:span 2}
-.calc-btn.clear{grid-column:span 2;background:#eef1f5}
-.field{margin-bottom:16px}
-label{display:block;font-weight:700;margin-bottom:7px;font-size:15px}
-.inputrow{display:flex;align-items:center;gap:8px}
-input{width:100%;min-width:0;font-size:22px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;outline:none;background:#fff}
-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,118,210,.12)}
-.unit{min-width:38px;color:var(--sub);font-size:14px}
-.results{margin-top:20px;border-top:1px solid var(--line);padding-top:18px;display:grid;gap:12px}
-.result{background:var(--result);border-radius:12px;padding:14px}
-.result .name{font-size:14px;color:var(--sub);margin-bottom:4px}
-.result .value{font-size:30px;font-weight:800;letter-spacing:.3px}
-.result .suffix{font-size:14px;font-weight:500;color:var(--sub);margin-left:5px}
-#clear{width:100%;margin-top:16px;border:0;border-radius:10px;padding:12px;font-size:16px;font-weight:700;background:#e9edf2;color:#30343a}
-
-html, body, button, input {
-  touch-action: manipulation;
+.calc-display{
+  width:100%;
+  font-size:28px;
+  font-weight:700;
+  text-align:right;
+  padding:14px 12px;
+  margin-bottom:10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  min-height:64px;
+  overflow:hidden;
 }
-button, .calc-btn, .calc-toggle, #clear {
-  -webkit-tap-highlight-color: transparent;
+.calc-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
 }
+.calc-btn{
+  margin:0;
+  padding:14px 0;
+  font-size:19px;
+  font-weight:700;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:#222;
+  -webkit-tap-highlight-color:transparent;
+}
+.calc-btn.op{
+  background:#eef6ff;
+  color:#1769aa;
+}
+.calc-btn.eq{
+  background:#1976d2;
+  color:#fff;
+  border-color:#1976d2;
+  grid-column:span 2;
+}
+.calc-btn.clear{
+  grid-column:span 2;
+  background:#eef1f5;
+}
+.field{
+  margin-bottom:16px;
+}
+.field-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:16px;
+}
+.field-row .field{
+  margin-bottom:0;
+  min-width:0;
+}
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:7px;
+  font-size:15px;
+}
+.inputrow{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+input{
+  width:100%;
+  min-width:0;
+  font-size:22px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  outline:none;
+  background:#fff;
+}
+input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(25,118,210,.12);
+}
+.unit{
+  flex:0 0 auto;
+  color:var(--sub);
+  font-size:14px;
+}
+.helper{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--sub);
+}
+.results{
+  margin-top:20px;
+  border-top:1px solid var(--line);
+  padding-top:18px;
+  display:grid;
+  gap:12px;
+}
+.result{
+  background:var(--result);
+  border-radius:12px;
+  padding:14px;
+}
+.result .name{
+  font-size:14px;
+  color:var(--sub);
+  margin-bottom:4px;
+}
+.result .value{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:.3px;
+}
+.result .suffix{
+  font-size:14px;
+  font-weight:500;
+  color:var(--sub);
+  margin-left:5px;
+}
+#clear{
+  width:100%;
+  margin-top:16px;
+  border:0;
+  border-radius:10px;
+  padding:12px;
+  font-size:16px;
+  font-weight:700;
+  background:#e9edf2;
+  color:#30343a;
+  -webkit-tap-highlight-color:transparent;
+}
+.formula{
+  margin-top:14px;
+  font-size:12px;
+  color:var(--sub);
+  line-height:1.6;
+}
+.error{
+  display:none;
+  margin-top:8px;
+  font-size:12px;
+  color:#b42318;
+}
+.error.show{display:block}
 
+@media(max-width:380px){
+  .field-row{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>生産出来高計算</h1>
-  <div class="note">生産数・所要時間・人員を入力すると自動計算します。</div>
+  <div class="note">生産数・所要時間・停止時間・人員から自動計算します。</div>
 
   <div class="card">
     <button id="calcToggle" class="calc-toggle" type="button">電卓を開く</button>
@@ -90,15 +260,28 @@ button, .calc-btn, .calc-toggle, #clear {
       </div>
     </div>
 
-    <div class="field">
-      <label for="minutes">所要時間</label>
-      <div class="inputrow">
-        <input id="minutes" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例：460">
-        <span class="unit">分</span>
+    <div class="field-row">
+      <div class="field">
+        <label for="minutes">所要時間</label>
+        <div class="inputrow">
+          <input id="minutes" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例：460">
+          <span class="unit">分</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="stopMinutes">合計停止時間</label>
+        <div class="inputrow">
+          <input id="stopMinutes" type="number" inputmode="decimal" min="0" step="0.1" placeholder="空欄OK">
+          <span class="unit">分</span>
+        </div>
       </div>
     </div>
 
-    <div class="field">
+    <div class="helper" id="effectiveTime">計算に使用する時間：－</div>
+    <div class="error" id="timeError">停止時間は所要時間未満で入力してください。</div>
+
+    <div class="field" style="margin-top:16px">
       <label for="people">人員</label>
       <div class="inputrow">
         <input id="people" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例：1">
@@ -111,6 +294,7 @@ button, .calc-btn, .calc-toggle, #clear {
         <div class="name">出来高</div>
         <div class="value"><span id="output">－</span><span class="suffix">個/時</span></div>
       </div>
+
       <div class="result">
         <div class="name">個当り工数</div>
         <div class="value"><span id="labor">－</span><span class="suffix">秒/個</span></div>
@@ -118,49 +302,132 @@ button, .calc-btn, .calc-toggle, #clear {
     </div>
 
     <button id="clear" type="button">入力をクリア</button>
+
+    <div class="formula">
+      停止時間が空欄：所要時間をそのまま使用<br>
+      停止時間あり：所要時間 − 合計停止時間で計算<br><br>
+      出来高 ＝ 生産数 ÷ 実稼働時間(分) × 60<br>
+      個当り工数 ＝ 実稼働時間(分) × 60 × 人員 ÷ 生産数<br>
+      ※表示は小数第2位を切り捨て
+    </div>
   </div>
 </div>
 
 <script>
-const qty=document.getElementById('qty'),minutes=document.getElementById('minutes'),people=document.getElementById('people'),output=document.getElementById('output'),labor=document.getElementById('labor');
-function fmt(n){return Number.isFinite(n)?(Math.floor((n + Number.EPSILON) * 10) / 10).toFixed(1):"－";}
-function calc(){
-  const q=parseFloat(qty.value),m=parseFloat(minutes.value),p=parseFloat(people.value);
-  output.textContent=fmt((q>0&&m>0)?q/m*60:NaN);
-  labor.textContent=fmt((q>0&&m>0&&p>0)?m*60*p/q:NaN);
-}
-[qty,minutes,people].forEach(el=>el.addEventListener('input',calc));
-document.getElementById('clear').addEventListener('click',()=>{qty.value='';minutes.value='';people.value='';calc();qty.focus();});
+const qty = document.getElementById('qty');
+const minutes = document.getElementById('minutes');
+const stopMinutes = document.getElementById('stopMinutes');
+const people = document.getElementById('people');
+const output = document.getElementById('output');
+const labor = document.getElementById('labor');
+const effectiveTime = document.getElementById('effectiveTime');
+const timeError = document.getElementById('timeError');
 
-const calcToggle=document.getElementById('calcToggle');
-const calculator=document.getElementById('calculator');
-const calcDisplay=document.getElementById('calcDisplay');
-let calcExpr='';
-calcToggle.addEventListener('click',()=>{
-  calculator.classList.toggle('open');
-  calcToggle.textContent=calculator.classList.contains('open')?'電卓を閉じる':'電卓を開く';
+function trunc1(n){
+  return Number.isFinite(n)
+    ? (Math.floor((n + Number.EPSILON) * 10) / 10).toFixed(1)
+    : "－";
+}
+
+function calc(){
+  const q = parseFloat(qty.value);
+  const m = parseFloat(minutes.value);
+  const s = stopMinutes.value === '' ? 0 : parseFloat(stopMinutes.value);
+  const p = parseFloat(people.value);
+
+  const validM = Number.isFinite(m) && m > 0;
+  const validS = Number.isFinite(s) && s >= 0;
+  const effective = validM && validS ? m - s : NaN;
+
+  const invalidStop = validM && validS && effective <= 0;
+  timeError.classList.toggle('show', invalidStop);
+
+  if (Number.isFinite(effective) && effective > 0) {
+    effectiveTime.textContent = '計算に使用する時間：' + trunc1(effective) + '分';
+  } else {
+    effectiveTime.textContent = '計算に使用する時間：－';
+  }
+
+  if (invalidStop) {
+    output.textContent = '－';
+    labor.textContent = '－';
+    return;
+  }
+
+  const out = (q > 0 && effective > 0) ? q / effective * 60 : NaN;
+  const lab = (q > 0 && effective > 0 && p > 0) ? effective * 60 * p / q : NaN;
+
+  output.textContent = trunc1(out);
+  labor.textContent = trunc1(lab);
+}
+
+[qty, minutes, stopMinutes, people].forEach(el => el.addEventListener('input', calc));
+
+document.getElementById('clear').addEventListener('click', () => {
+  qty.value = '';
+  minutes.value = '';
+  stopMinutes.value = '';
+  people.value = '';
+  calc();
+  qty.focus();
 });
-document.querySelectorAll('.calc-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const action=btn.dataset.action,value=btn.dataset.value;
-    if(action==='clear'){calcExpr='';calcDisplay.textContent='0';return;}
-    if(action==='back'){calcExpr=calcExpr.slice(0,-1);calcDisplay.textContent=calcExpr||'0';return;}
-    if(action==='equals'){
-      if(!calcExpr)return;
-      try{
-        const safe=calcExpr.replace(/×/g,'*').replace(/÷/g,'/');
-        if(!/^[0-9+\-*/.() ]+$/.test(safe))throw new Error();
-        const result=Function('"use strict";return ('+safe+')')();
-        if(!Number.isFinite(result))throw new Error();
-        calcExpr=String(Math.round((result+Number.EPSILON)*1000000)/1000000);
-        calcDisplay.textContent=calcExpr;
-      }catch(e){calcDisplay.textContent='エラー';calcExpr='';}
+
+const calcToggle = document.getElementById('calcToggle');
+const calculator = document.getElementById('calculator');
+const calcDisplay = document.getElementById('calcDisplay');
+let calcExpr = '';
+
+calcToggle.addEventListener('click', () => {
+  calculator.classList.toggle('open');
+  calcToggle.textContent = calculator.classList.contains('open')
+    ? '電卓を閉じる'
+    : '電卓を開く';
+});
+
+document.querySelectorAll('.calc-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    const value = btn.dataset.value;
+
+    if (action === 'clear') {
+      calcExpr = '';
+      calcDisplay.textContent = '0';
       return;
     }
-    if(value){calcExpr+=value;calcDisplay.textContent=calcExpr;}
+
+    if (action === 'back') {
+      calcExpr = calcExpr.slice(0, -1);
+      calcDisplay.textContent = calcExpr || '0';
+      return;
+    }
+
+    if (action === 'equals') {
+      if (!calcExpr) return;
+      try {
+        const safe = calcExpr.replace(/×/g, '*').replace(/÷/g, '/');
+        if (!/^[0-9+\-*/.() ]+$/.test(safe)) throw new Error();
+        const result = Function('"use strict";return (' + safe + ')')();
+        if (!Number.isFinite(result)) throw new Error();
+
+        calcExpr = String(
+          Math.round((result + Number.EPSILON) * 1000000) / 1000000
+        );
+        calcDisplay.textContent = calcExpr;
+      } catch {
+        calcDisplay.textContent = 'エラー';
+        calcExpr = '';
+      }
+      return;
+    }
+
+    if (value) {
+      calcExpr += value;
+      calcDisplay.textContent = calcExpr;
+    }
   });
 });
 
+/* iPhone Safariのダブルタップ拡大を抑制 */
 let lastTouchEnd = 0;
 document.addEventListener('touchend', function(event) {
   const now = Date.now();
