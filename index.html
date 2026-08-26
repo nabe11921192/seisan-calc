@@ -13,8 +13,12 @@
   --line:#d9dee5;
   --accent:#1976d2;
   --result:#eef6ff;
+  --calc-bg:#000;
+  --calc-key:#333;
+  --calc-fn:#6b6b6b;
+  --calc-op:#ff9f0a;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body,button,input{touch-action:manipulation}
 body{
   margin:0;
@@ -42,6 +46,8 @@ h1{
   padding:18px;
   box-shadow:0 3px 16px rgba(0,0,0,.07);
 }
+
+/* 上部の通常電卓 */
 .calc-toggle{
   width:100%;
   margin:0 0 16px;
@@ -52,7 +58,6 @@ h1{
   font-weight:800;
   background:#eaf3ff;
   color:#1769aa;
-  -webkit-tap-highlight-color:transparent;
 }
 .calculator{
   display:none;
@@ -90,7 +95,6 @@ h1{
   border-radius:10px;
   background:#fff;
   color:#222;
-  -webkit-tap-highlight-color:transparent;
 }
 .calc-btn.op{
   background:#eef6ff;
@@ -106,9 +110,9 @@ h1{
   grid-column:span 2;
   background:#eef1f5;
 }
-.field{
-  margin-bottom:16px;
-}
+
+/* 生産計算 */
+.field{margin-bottom:16px}
 .field-row{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -140,8 +144,9 @@ input{
   border-radius:10px;
   outline:none;
   background:#fff;
+  caret-color:transparent;
 }
-input:focus{
+input.pad-active{
   border-color:var(--accent);
   box-shadow:0 0 0 3px rgba(25,118,210,.12);
 }
@@ -193,7 +198,6 @@ input:focus{
   font-weight:700;
   background:#e9edf2;
   color:#30343a;
-  -webkit-tap-highlight-color:transparent;
 }
 .formula{
   margin-top:14px;
@@ -209,46 +213,88 @@ input:focus{
 }
 .error.show{display:block}
 
-@media(max-width:380px){
-  .field-row{
-    grid-template-columns:1fr;
-  }
-}
-
-/* ===== iPhone電卓風 入力テンキー ===== */
-body.pad-open{padding-bottom:520px}
+/* iPhone電卓風 入力テンキー */
+body.pad-open{padding-bottom:500px}
 .custom-pad{
   display:none;
   position:fixed;
-  left:0; right:0; bottom:0;
+  left:0;
+  right:0;
+  bottom:0;
   z-index:9999;
-  background:#000;
-  padding:10px 14px calc(16px + env(safe-area-inset-bottom));
+  background:var(--calc-bg);
+  padding:10px 14px calc(14px + env(safe-area-inset-bottom));
   box-shadow:0 -4px 18px rgba(0,0,0,.22);
 }
 .custom-pad.open{display:block}
 .pad-head{
-  display:flex; align-items:center; justify-content:space-between;
-  max-width:520px; margin:0 auto 8px;
-  color:#fff; font-weight:800; font-size:15px;
+  max-width:520px;
+  margin:0 auto 8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.pad-title{
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  min-width:0;
+}
+.pad-expression{
+  color:#aaa;
+  font-size:13px;
+  font-weight:600;
+  margin-top:2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .pad-close{
-  border:0; border-radius:18px; background:#292929; color:#fff;
-  padding:8px 15px; font-size:14px; font-weight:800;
+  flex:0 0 auto;
+  border:0;
+  border-radius:20px;
+  background:#292929;
+  color:#fff;
+  padding:9px 15px;
+  font-size:14px;
+  font-weight:800;
 }
 .pad-grid{
-  max-width:520px; margin:0 auto;
-  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  max-width:520px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
 }
 .pad-btn{
-  height:70px; border:0; border-radius:50%;
-  background:#333; color:#fff; font-size:29px; font-weight:500;
-  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+  height:70px;
+  border:0;
+  border-radius:50%;
+  background:var(--calc-key);
+  color:#fff;
+  font-size:29px;
+  font-weight:500;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  user-select:none;
+  -webkit-user-select:none;
 }
-.pad-btn.top{background:#6d6d6d}
-.pad-btn.op{background:#ff9f0a}
-.pad-btn.next{background:#ff9f0a;font-size:18px;font-weight:800}
+.pad-btn.fn{background:var(--calc-fn)}
+.pad-btn.op{background:var(--calc-op)}
+.pad-btn.next{
+  background:var(--calc-op);
+  font-size:18px;
+  font-weight:800;
+}
+.pad-btn:active{
+  filter:brightness(1.35);
+  transform:scale(.985);
+}
+
 @media(max-width:380px){
+  .field-row{grid-template-columns:1fr}
   .pad-btn{height:64px}
 }
 </style>
@@ -264,35 +310,35 @@ body.pad-open{padding-bottom:520px}
     <div id="calculator" class="calculator">
       <div id="calcDisplay" class="calc-display">0</div>
       <div class="calc-grid">
-        <button class="calc-btn clear" type="button" data-action="clear">C</button>
-        <button class="calc-btn" type="button" data-action="back">⌫</button>
-        <button class="calc-btn op" type="button" data-value="÷">÷</button>
+        <button class="calc-btn clear" type="button" data-calc-action="clear">C</button>
+        <button class="calc-btn" type="button" data-calc-action="back">⌫</button>
+        <button class="calc-btn op" type="button" data-calc-value="÷">÷</button>
 
-        <button class="calc-btn" type="button" data-value="7">7</button>
-        <button class="calc-btn" type="button" data-value="8">8</button>
-        <button class="calc-btn" type="button" data-value="9">9</button>
-        <button class="calc-btn op" type="button" data-value="×">×</button>
+        <button class="calc-btn" type="button" data-calc-value="7">7</button>
+        <button class="calc-btn" type="button" data-calc-value="8">8</button>
+        <button class="calc-btn" type="button" data-calc-value="9">9</button>
+        <button class="calc-btn op" type="button" data-calc-value="×">×</button>
 
-        <button class="calc-btn" type="button" data-value="4">4</button>
-        <button class="calc-btn" type="button" data-value="5">5</button>
-        <button class="calc-btn" type="button" data-value="6">6</button>
-        <button class="calc-btn op" type="button" data-value="-">−</button>
+        <button class="calc-btn" type="button" data-calc-value="4">4</button>
+        <button class="calc-btn" type="button" data-calc-value="5">5</button>
+        <button class="calc-btn" type="button" data-calc-value="6">6</button>
+        <button class="calc-btn op" type="button" data-calc-value="-">−</button>
 
-        <button class="calc-btn" type="button" data-value="1">1</button>
-        <button class="calc-btn" type="button" data-value="2">2</button>
-        <button class="calc-btn" type="button" data-value="3">3</button>
-        <button class="calc-btn op" type="button" data-value="+">＋</button>
+        <button class="calc-btn" type="button" data-calc-value="1">1</button>
+        <button class="calc-btn" type="button" data-calc-value="2">2</button>
+        <button class="calc-btn" type="button" data-calc-value="3">3</button>
+        <button class="calc-btn op" type="button" data-calc-value="+">＋</button>
 
-        <button class="calc-btn" type="button" data-value="0">0</button>
-        <button class="calc-btn" type="button" data-value=".">.</button>
-        <button class="calc-btn eq" type="button" data-action="equals">＝</button>
+        <button class="calc-btn" type="button" data-calc-value="0">0</button>
+        <button class="calc-btn" type="button" data-calc-value=".">.</button>
+        <button class="calc-btn eq" type="button" data-calc-action="equals">＝</button>
       </div>
     </div>
 
     <div class="field">
       <label for="qty">生産数</label>
       <div class="inputrow">
-        <input id="qty" type="text" readonly inputmode="decimal" min="0" step="1" placeholder="例：400">
+        <input id="qty" type="text" inputmode="none" readonly placeholder="例：400">
         <span class="unit">個</span>
       </div>
     </div>
@@ -301,7 +347,7 @@ body.pad-open{padding-bottom:520px}
       <div class="field">
         <label for="minutes">所要時間</label>
         <div class="inputrow">
-          <input id="minutes" type="text" readonly inputmode="decimal" min="0" step="0.1" placeholder="例：460">
+          <input id="minutes" type="text" inputmode="none" readonly placeholder="例：460">
           <span class="unit">分</span>
         </div>
       </div>
@@ -309,7 +355,7 @@ body.pad-open{padding-bottom:520px}
       <div class="field">
         <label for="stopMinutes">合計停止時間</label>
         <div class="inputrow">
-          <input id="stopMinutes" type="text" readonly inputmode="decimal" min="0" step="0.1" placeholder="空欄OK">
+          <input id="stopMinutes" type="text" inputmode="none" readonly placeholder="空欄OK">
           <span class="unit">分</span>
         </div>
       </div>
@@ -321,7 +367,7 @@ body.pad-open{padding-bottom:520px}
     <div class="field" style="margin-top:16px">
       <label for="people">人員</label>
       <div class="inputrow">
-        <input id="people" type="text" readonly inputmode="decimal" min="0" step="0.1" placeholder="例：1">
+        <input id="people" type="text" inputmode="none" readonly placeholder="例：1">
         <span class="unit">人</span>
       </div>
     </div>
@@ -350,37 +396,40 @@ body.pad-open{padding-bottom:520px}
   </div>
 </div>
 
-
 <div id="customPad" class="custom-pad" aria-hidden="true">
   <div class="pad-head">
-    <span id="padTitle">入力</span>
+    <div style="min-width:0">
+      <div id="padTitle" class="pad-title">入力</div>
+      <div id="padExpression" class="pad-expression"></div>
+    </div>
     <button id="padClose" class="pad-close" type="button">閉じる</button>
   </div>
+
   <div class="pad-grid">
-    <button class="pad-btn top" data-pad="back">⌫</button>
-    <button class="pad-btn top" data-pad="clear">AC</button>
-    <button class="pad-btn top" data-pad="percent">%</button>
-    <button class="pad-btn op" data-pad="divide">÷</button>
+    <button class="pad-btn fn" type="button" data-pad="back">⌫</button>
+    <button class="pad-btn fn" type="button" data-pad="clear">AC</button>
+    <button class="pad-btn fn" type="button" data-pad="percent">%</button>
+    <button class="pad-btn op" type="button" data-pad="÷">÷</button>
 
-    <button class="pad-btn" data-pad="7">7</button>
-    <button class="pad-btn" data-pad="8">8</button>
-    <button class="pad-btn" data-pad="9">9</button>
-    <button class="pad-btn op" data-pad="multiply">×</button>
+    <button class="pad-btn" type="button" data-pad="7">7</button>
+    <button class="pad-btn" type="button" data-pad="8">8</button>
+    <button class="pad-btn" type="button" data-pad="9">9</button>
+    <button class="pad-btn op" type="button" data-pad="×">×</button>
 
-    <button class="pad-btn" data-pad="4">4</button>
-    <button class="pad-btn" data-pad="5">5</button>
-    <button class="pad-btn" data-pad="6">6</button>
-    <button class="pad-btn op" data-pad="minus">−</button>
+    <button class="pad-btn" type="button" data-pad="4">4</button>
+    <button class="pad-btn" type="button" data-pad="5">5</button>
+    <button class="pad-btn" type="button" data-pad="6">6</button>
+    <button class="pad-btn op" type="button" data-pad="−">−</button>
 
-    <button class="pad-btn" data-pad="1">1</button>
-    <button class="pad-btn" data-pad="2">2</button>
-    <button class="pad-btn" data-pad="3">3</button>
-    <button class="pad-btn op" data-pad="plus">＋</button>
+    <button class="pad-btn" type="button" data-pad="1">1</button>
+    <button class="pad-btn" type="button" data-pad="2">2</button>
+    <button class="pad-btn" type="button" data-pad="3">3</button>
+    <button class="pad-btn op" type="button" data-pad="+">＋</button>
 
-    <button class="pad-btn top" data-pad="sign">±</button>
-    <button class="pad-btn" data-pad="0">0</button>
-    <button class="pad-btn" data-pad=".">.</button>
-    <button class="pad-btn next" data-pad="next">次へ</button>
+    <button class="pad-btn fn" type="button" data-pad="sign">±</button>
+    <button class="pad-btn" type="button" data-pad="0">0</button>
+    <button class="pad-btn" type="button" data-pad=".">.</button>
+    <button id="padNext" class="pad-btn next" type="button" data-pad="next">次へ</button>
   </div>
 </div>
 
@@ -395,9 +444,9 @@ const effectiveTime = document.getElementById('effectiveTime');
 const timeError = document.getElementById('timeError');
 
 function trunc1(n){
-  return Number.isFinite(n)
-    ? (Math.floor((n + Number.EPSILON) * 10) / 10).toFixed(1)
-    : "－";
+  if(!Number.isFinite(n)) return "－";
+  const corrected = Number(n.toFixed(10));
+  return (Math.trunc(corrected * 10) / 10).toFixed(1);
 }
 
 function calc(){
@@ -413,13 +462,13 @@ function calc(){
   const invalidStop = validM && validS && effective <= 0;
   timeError.classList.toggle('show', invalidStop);
 
-  if (Number.isFinite(effective) && effective > 0) {
+  if(Number.isFinite(effective) && effective > 0){
     effectiveTime.textContent = '計算に使用する時間：' + trunc1(effective) + '分';
-  } else {
+  }else{
     effectiveTime.textContent = '計算に使用する時間：－';
   }
 
-  if (invalidStop) {
+  if(invalidStop){
     output.textContent = '－';
     labor.textContent = '－';
     return;
@@ -432,17 +481,7 @@ function calc(){
   labor.textContent = trunc1(lab);
 }
 
-[qty, minutes, stopMinutes, people].forEach(el => el.addEventListener('input', calc));
-
-document.getElementById('clear').addEventListener('click', () => {
-  qty.value = '';
-  minutes.value = '';
-  stopMinutes.value = '';
-  people.value = '';
-  calc();
-  qty.focus();
-});
-
+/* 上部の通常電卓 */
 const calcToggle = document.getElementById('calcToggle');
 const calculator = document.getElementById('calculator');
 const calcDisplay = document.getElementById('calcDisplay');
@@ -450,135 +489,266 @@ let calcExpr = '';
 
 calcToggle.addEventListener('click', () => {
   calculator.classList.toggle('open');
-  calcToggle.textContent = calculator.classList.contains('open')
-    ? '電卓を閉じる'
-    : '電卓を開く';
+  calcToggle.textContent = calculator.classList.contains('open') ? '電卓を閉じる' : '電卓を開く';
 });
 
 document.querySelectorAll('.calc-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const action = btn.dataset.action;
-    const value = btn.dataset.value;
+  btn.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const action = btn.dataset.calcAction;
+    const value = btn.dataset.calcValue;
 
-    if (action === 'clear') {
+    if(action === 'clear'){
       calcExpr = '';
       calcDisplay.textContent = '0';
       return;
     }
-
-    if (action === 'back') {
-      calcExpr = calcExpr.slice(0, -1);
+    if(action === 'back'){
+      calcExpr = calcExpr.slice(0,-1);
       calcDisplay.textContent = calcExpr || '0';
       return;
     }
-
-    if (action === 'equals') {
-      if (!calcExpr) return;
-      try {
-        const safe = calcExpr.replace(/×/g, '*').replace(/÷/g, '/');
-        if (!/^[0-9+\-*/.() ]+$/.test(safe)) throw new Error();
+    if(action === 'equals'){
+      if(!calcExpr) return;
+      try{
+        const safe = calcExpr.replace(/×/g,'*').replace(/÷/g,'/');
+        if(!/^[0-9+\-*/.() ]+$/.test(safe)) throw new Error();
         const result = Function('"use strict";return (' + safe + ')')();
-        if (!Number.isFinite(result)) throw new Error();
-
-        calcExpr = String(
-          Math.round((result + Number.EPSILON) * 1000000) / 1000000
-        );
+        if(!Number.isFinite(result)) throw new Error();
+        calcExpr = String(Number(result.toFixed(10)));
         calcDisplay.textContent = calcExpr;
-      } catch {
+      }catch{
         calcDisplay.textContent = 'エラー';
         calcExpr = '';
       }
       return;
     }
-
-    if (value) {
+    if(value){
       calcExpr += value;
       calcDisplay.textContent = calcExpr;
     }
   });
 });
 
-/* iPhone Safariのダブルタップ拡大を抑制 */
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(event) {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, { passive: false });
-
-
-/* ===== 入力欄用 iPhone電卓風テンキー ===== */
+/* 入力欄用 iPhone電卓風テンキー */
 const customPad = document.getElementById('customPad');
 const padTitle = document.getElementById('padTitle');
+const padExpression = document.getElementById('padExpression');
 const padClose = document.getElementById('padClose');
+const padNext = document.getElementById('padNext');
 const padInputs = [qty, minutes, stopMinutes, people];
 const padNames = ['生産数を入力','所要時間を入力','合計停止時間を入力','人員を入力'];
-let activePadInput = null;
 
-function keepInputVisible(el){
-  requestAnimationFrame(()=>{
+let activeIndex = 0;
+let expression = '';
+
+function safeEval(expr){
+  const safe = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+  if(!/^[0-9+\-*/.() ]+$/.test(safe)) return NaN;
+  try{
+    const result = Function('"use strict";return (' + safe + ')')();
+    return Number.isFinite(result) ? Number(result.toFixed(10)) : NaN;
+  }catch{
+    return NaN;
+  }
+}
+
+function updatePadHeader(){
+  padTitle.textContent = padNames[activeIndex];
+  padExpression.textContent = expression;
+  padNext.textContent = activeIndex === padInputs.length - 1 ? '完了' : '次へ';
+}
+
+function ensureActiveVisible(){
+  requestAnimationFrame(() => {
+    const el = padInputs[activeIndex];
     const padTop = customPad.getBoundingClientRect().top;
     const r = el.getBoundingClientRect();
+    const safeTop = 90;
     const safeBottom = padTop - 18;
+
     if(r.bottom > safeBottom){
-      window.scrollBy({top:r.bottom-safeBottom,behavior:'smooth'});
+      window.scrollBy({top:r.bottom - safeBottom, behavior:'smooth'});
+    }else if(r.top < safeTop){
+      window.scrollBy({top:r.top - safeTop, behavior:'smooth'});
     }
+
+    setTimeout(() => {
+      const r2 = el.getBoundingClientRect();
+      const padTop2 = customPad.getBoundingClientRect().top;
+      if(r2.bottom > padTop2 - 18){
+        window.scrollBy({top:r2.bottom - (padTop2 - 18), behavior:'auto'});
+      }
+    }, 180);
   });
 }
-function openCustomPad(el){
-  activePadInput = el;
-  const idx = padInputs.indexOf(el);
-  padTitle.textContent = padNames[idx] || '入力';
+
+function openPad(index){
+  activeIndex = index;
+  expression = '';
   customPad.classList.add('open');
   customPad.setAttribute('aria-hidden','false');
   document.body.classList.add('pad-open');
-  padInputs.forEach(x=>x.classList.toggle('pad-active',x===el));
-  keepInputVisible(el);
+  padInputs.forEach((el,i) => el.classList.toggle('pad-active', i === activeIndex));
+  updatePadHeader();
+  ensureActiveVisible();
 }
-function closeCustomPad(){
+
+function finishExpression(){
+  const el = padInputs[activeIndex];
+  if(!expression) return true;
+
+  let expr = expression;
+  if(el.value !== ''){
+    const last = expr.slice(-1);
+    if(/[×÷−+]/.test(last)){
+      expr += el.value;
+    }
+  }
+
+  if(/[×÷−+]$/.test(expr)) return false;
+
+  const result = safeEval(expr);
+  if(!Number.isFinite(result)) return false;
+
+  el.value = String(result);
+  expression = '';
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  updatePadHeader();
+  return true;
+}
+
+function closePad(){
+  finishExpression();
   customPad.classList.remove('open');
   customPad.setAttribute('aria-hidden','true');
   document.body.classList.remove('pad-open');
-  activePadInput = null;
+  padInputs.forEach(el => el.classList.remove('pad-active'));
 }
-padInputs.forEach(el=>{
-  el.addEventListener('click',()=>openCustomPad(el));
-  el.addEventListener('focus',()=>openCustomPad(el));
-});
-padClose.addEventListener('click',closeCustomPad);
 
-document.querySelectorAll('[data-pad]').forEach(btn=>{
-  btn.addEventListener('pointerdown',e=>{
+padInputs.forEach((el,i) => {
+  el.addEventListener('pointerdown', e => {
     e.preventDefault();
-    if(!activePadInput) return;
-    const k=btn.dataset.pad;
-    let v=activePadInput.value;
-
-    if(/^[0-9]$/.test(k)){
-      activePadInput.value = (v==='0' ? '' : v) + k;
-    }else if(k==='.'){
-      if(!v.includes('.')) activePadInput.value = (v || '0') + '.';
-    }else if(k==='back'){
-      activePadInput.value = v.slice(0,-1);
-    }else if(k==='clear'){
-      activePadInput.value = '';
-    }else if(k==='sign'){
-      if(v) activePadInput.value = v.startsWith('-') ? v.slice(1) : '-'+v;
-    }else if(k==='percent'){
-      if(v && Number.isFinite(Number(v))) activePadInput.value = String(Number(v)/100);
-    }else if(k==='next'){
-      const i=padInputs.indexOf(activePadInput);
-      const next=padInputs[(i+1)%padInputs.length];
-      openCustomPad(next);
-      return;
-    }else{
-      return; // 演算子は配置再現用。入力欄では数値入力を優先
-    }
-    activePadInput.dispatchEvent(new Event('input',{bubbles:true}));
+    openPad(i);
   });
 });
+
+padClose.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  closePad();
+});
+
+document.querySelectorAll('[data-pad]').forEach(btn => {
+  btn.addEventListener('pointerdown', e => {
+    e.preventDefault();
+
+    const key = btn.dataset.pad;
+    const el = padInputs[activeIndex];
+    let v = el.value;
+
+    if(/^[0-9]$/.test(key)){
+      if(v === '0') v = '';
+      el.value = v + key;
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      if(expression){
+        const parts = expression.split(/[×÷−+]/);
+        updatePadHeader();
+      }
+      return;
+    }
+
+    if(key === '.'){
+      if(!v.includes('.')){
+        el.value = (v || '0') + '.';
+        el.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      return;
+    }
+
+    if(key === 'back'){
+      el.value = v.slice(0,-1);
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      return;
+    }
+
+    if(key === 'clear'){
+      el.value = '';
+      expression = '';
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      updatePadHeader();
+      return;
+    }
+
+    if(key === 'sign'){
+      if(v !== ''){
+        el.value = v.startsWith('-') ? v.slice(1) : '-' + v;
+        el.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      return;
+    }
+
+    if(key === 'percent'){
+      if(v !== '' && Number.isFinite(Number(v))){
+        el.value = String(Number(v) / 100);
+        el.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      return;
+    }
+
+    if(/[×÷−+]/.test(key)){
+      if(v === '') return;
+
+      if(!expression){
+        expression = v + key;
+        el.value = '';
+      }else{
+        let expr = expression + v;
+        const result = safeEval(expr);
+        if(Number.isFinite(result)){
+          expression = String(result) + key;
+          el.value = '';
+        }else{
+          return;
+        }
+      }
+
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      updatePadHeader();
+      return;
+    }
+
+    if(key === 'next'){
+      if(!finishExpression()) return;
+      calc();
+
+      if(activeIndex < padInputs.length - 1){
+        openPad(activeIndex + 1);
+      }else{
+        closePad();
+      }
+    }
+  });
+});
+
+[qty,minutes,stopMinutes,people].forEach(el => el.addEventListener('input',calc));
+
+document.getElementById('clear').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  qty.value = '';
+  minutes.value = '';
+  stopMinutes.value = '';
+  people.value = '';
+  expression = '';
+  calc();
+  openPad(0);
+});
+
+/* 画面回転・表示領域変更時にも、入力欄がテンキーに隠れないよう再調整 */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', () => {
+    if(customPad.classList.contains('open')) ensureActiveVisible();
+  });
+}
 
 calc();
 </script>
