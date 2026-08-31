@@ -47,21 +47,49 @@ h1{
   box-shadow:0 3px 16px rgba(0,0,0,.07);
 }
 
-/* 稼働時間の目安 */
+/* 所要時間の目安 */
 .work-time-guide{
   margin:0 0 16px;
-  padding:10px 12px;
-  border-radius:10px;
+  padding:12px;
+  border-radius:12px;
   background:#f5f8fc;
-  color:var(--sub);
-  font-size:11px;
-  line-height:1.7;
 }
 .work-time-guide strong{
   display:block;
-  margin-bottom:2px;
+  margin-bottom:8px;
   color:var(--text);
-  font-size:12px;
+  font-size:14px;
+}
+.work-time-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+.work-time-item{
+  padding:8px 9px;
+  border:1px solid #dce5f0;
+  border-radius:9px;
+  background:#fff;
+}
+.work-time-item .overtime{
+  display:block;
+  margin-bottom:2px;
+  color:#1769aa;
+  font-size:11px;
+  font-weight:800;
+}
+.work-time-item .time{
+  color:var(--text);
+  font-size:14px;
+  font-weight:800;
+}
+.work-time-item .minutes{
+  margin-left:4px;
+  color:var(--sub);
+  font-size:11px;
+}
+.work-time-item:last-child{
+  grid-column:1 / -1;
 }
 
 /* 生産計算 */
@@ -279,11 +307,16 @@ body.pad-open{padding-bottom:500px}
 
   <div class="card">
     <div class="work-time-guide">
-      <strong>稼働時間</strong>
-      17:10（460分／定時） ／ 17:50（490分／0.5H残） ／<br>
-      18:20（520分／1.0H残） ／ 18:50（550分／1.5H残） ／<br>
-      19:20（580分／2.0H残） ／ 20:00（610分／2.5H残） ／<br>
-      20:05（615分／2.58H残）
+      <strong>所要時間</strong>
+      <div class="work-time-grid">
+        <div class="work-time-item"><span class="overtime">定時</span><span class="time">17:10</span><span class="minutes">460分</span></div>
+        <div class="work-time-item"><span class="overtime">0.5H残</span><span class="time">17:50</span><span class="minutes">490分</span></div>
+        <div class="work-time-item"><span class="overtime">1.0H残</span><span class="time">18:20</span><span class="minutes">520分</span></div>
+        <div class="work-time-item"><span class="overtime">1.5H残</span><span class="time">18:50</span><span class="minutes">550分</span></div>
+        <div class="work-time-item"><span class="overtime">2.0H残</span><span class="time">19:20</span><span class="minutes">580分</span></div>
+        <div class="work-time-item"><span class="overtime">2.5H残</span><span class="time">20:00</span><span class="minutes">610分</span></div>
+        <div class="work-time-item"><span class="overtime">2.58H残</span><span class="time">20:05</span><span class="minutes">615分</span></div>
+      </div>
     </div>
 
     <div class="field">
