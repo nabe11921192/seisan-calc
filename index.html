@@ -47,68 +47,21 @@ h1{
   box-shadow:0 3px 16px rgba(0,0,0,.07);
 }
 
-/* 上部の通常電卓 */
-.calc-toggle{
-  width:100%;
+/* 稼働時間の目安 */
+.work-time-guide{
   margin:0 0 16px;
-  border:0;
-  border-radius:12px;
-  padding:13px 16px;
-  font-size:16px;
-  font-weight:800;
-  background:#eaf3ff;
-  color:#1769aa;
-}
-.calculator{
-  display:none;
-  margin-bottom:20px;
-  padding:14px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#f8fafc;
-}
-.calculator.open{display:block}
-.calc-display{
-  width:100%;
-  font-size:28px;
-  font-weight:700;
-  text-align:right;
-  padding:14px 12px;
-  margin-bottom:10px;
-  border:1px solid var(--line);
+  padding:10px 12px;
   border-radius:10px;
-  background:#fff;
-  min-height:64px;
-  overflow:hidden;
+  background:#f5f8fc;
+  color:var(--sub);
+  font-size:11px;
+  line-height:1.7;
 }
-.calc-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-}
-.calc-btn{
-  margin:0;
-  padding:14px 0;
-  font-size:19px;
-  font-weight:700;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-  color:#222;
-}
-.calc-btn.op{
-  background:#eef6ff;
-  color:#1769aa;
-}
-.calc-btn.eq{
-  background:#1976d2;
-  color:#fff;
-  border-color:#1976d2;
-  grid-column:span 2;
-}
-.calc-btn.clear{
-  grid-column:span 2;
-  background:#eef1f5;
+.work-time-guide strong{
+  display:block;
+  margin-bottom:2px;
+  color:var(--text);
+  font-size:12px;
 }
 
 /* 生産計算 */
@@ -325,34 +278,10 @@ body.pad-open{padding-bottom:500px}
   <div class="note">生産数・所要時間・停止時間・人員から自動計算します。</div>
 
   <div class="card">
-    <button id="calcToggle" class="calc-toggle" type="button">電卓を開く</button>
-
-    <div id="calculator" class="calculator">
-      <div id="calcDisplay" class="calc-display">0</div>
-      <div class="calc-grid">
-        <button class="calc-btn clear" type="button" data-calc-action="clear">C</button>
-        <button class="calc-btn" type="button" data-calc-action="back">⌫</button>
-        <button class="calc-btn op" type="button" data-calc-value="÷">÷</button>
-
-        <button class="calc-btn" type="button" data-calc-value="7">7</button>
-        <button class="calc-btn" type="button" data-calc-value="8">8</button>
-        <button class="calc-btn" type="button" data-calc-value="9">9</button>
-        <button class="calc-btn op" type="button" data-calc-value="×">×</button>
-
-        <button class="calc-btn" type="button" data-calc-value="4">4</button>
-        <button class="calc-btn" type="button" data-calc-value="5">5</button>
-        <button class="calc-btn" type="button" data-calc-value="6">6</button>
-        <button class="calc-btn op" type="button" data-calc-value="-">−</button>
-
-        <button class="calc-btn" type="button" data-calc-value="1">1</button>
-        <button class="calc-btn" type="button" data-calc-value="2">2</button>
-        <button class="calc-btn" type="button" data-calc-value="3">3</button>
-        <button class="calc-btn op" type="button" data-calc-value="+">＋</button>
-
-        <button class="calc-btn" type="button" data-calc-value="0">0</button>
-        <button class="calc-btn" type="button" data-calc-value=".">.</button>
-        <button class="calc-btn eq" type="button" data-calc-action="equals">＝</button>
-      </div>
+    <div class="work-time-guide">
+      <strong>稼働時間</strong>
+      17:10（460分／定時） ／ 18:20（520分／1.0H残） ／<br>
+      19:20（580分／2.0H残） ／ 20:05（615分／2.58H残）
     </div>
 
     <div class="field">
@@ -509,55 +438,6 @@ function calc(){
   output.textContent = trunc1(out);
   labor.textContent = trunc1(lab);
 }
-
-/* 上部の通常電卓 */
-const calcToggle = document.getElementById('calcToggle');
-const calculator = document.getElementById('calculator');
-const calcDisplay = document.getElementById('calcDisplay');
-let calcExpr = '';
-
-calcToggle.addEventListener('click', () => {
-  calculator.classList.toggle('open');
-  calcToggle.textContent = calculator.classList.contains('open') ? '電卓を閉じる' : '電卓を開く';
-});
-
-document.querySelectorAll('.calc-btn').forEach(btn => {
-  btn.addEventListener('pointerdown', e => {
-    e.preventDefault();
-    const action = btn.dataset.calcAction;
-    const value = btn.dataset.calcValue;
-
-    if(action === 'clear'){
-      calcExpr = '';
-      calcDisplay.textContent = '0';
-      return;
-    }
-    if(action === 'back'){
-      calcExpr = calcExpr.slice(0,-1);
-      calcDisplay.textContent = calcExpr || '0';
-      return;
-    }
-    if(action === 'equals'){
-      if(!calcExpr) return;
-      try{
-        const safe = calcExpr.replace(/×/g,'*').replace(/÷/g,'/');
-        if(!/^[0-9+\-*/.() ]+$/.test(safe)) throw new Error();
-        const result = Function('"use strict";return (' + safe + ')')();
-        if(!Number.isFinite(result)) throw new Error();
-        calcExpr = String(Number(result.toFixed(10)));
-        calcDisplay.textContent = calcExpr;
-      }catch{
-        calcDisplay.textContent = 'エラー';
-        calcExpr = '';
-      }
-      return;
-    }
-    if(value){
-      calcExpr += value;
-      calcDisplay.textContent = calcExpr;
-    }
-  });
-});
 
 /* 入力欄用 iPhone電卓風テンキー */
 const customPad = document.getElementById('customPad');
