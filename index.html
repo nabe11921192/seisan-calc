@@ -50,46 +50,46 @@ h1{
 /* 所要時間の目安 */
 .work-time-guide{
   margin:0 0 16px;
-  padding:12px;
-  border-radius:12px;
+  padding:6px 8px;
+  border-radius:9px;
   background:#f5f8fc;
 }
 .work-time-guide strong{
   display:block;
-  margin-bottom:8px;
+  margin-bottom:3px;
   color:var(--text);
-  font-size:14px;
+  font-size:12px;
 }
 .work-time-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  column-gap:5px;
+  row-gap:3px;
 }
 .work-time-item{
-  padding:8px 9px;
-  border:1px solid #dce5f0;
-  border-radius:9px;
-  background:#fff;
+  min-width:0;
+  text-align:center;
+  line-height:1.1;
 }
 .work-time-item .overtime{
-  display:block;
-  margin-bottom:2px;
+  display:inline;
+  margin-left:1px;
   color:#1769aa;
-  font-size:11px;
+  font-size:9px;
   font-weight:800;
 }
 .work-time-item .time{
+  display:inline;
   color:var(--text);
-  font-size:14px;
-  font-weight:800;
+  font-size:9px;
+  font-weight:700;
 }
 .work-time-item .minutes{
-  margin-left:4px;
+  display:block;
+  margin-top:1px;
   color:var(--sub);
-  font-size:11px;
-}
-.work-time-item:last-child{
-  grid-column:1 / -1;
+  font-size:10px;
+  font-weight:700;
 }
 
 /* 生産計算 */
@@ -309,13 +309,13 @@ body.pad-open{padding-bottom:500px}
     <div class="work-time-guide">
       <strong>所要時間</strong>
       <div class="work-time-grid">
-        <div class="work-time-item"><span class="overtime">定時</span><span class="time">17:10</span><span class="minutes">460分</span></div>
-        <div class="work-time-item"><span class="overtime">0.5H残</span><span class="time">17:50</span><span class="minutes">490分</span></div>
-        <div class="work-time-item"><span class="overtime">1.0H残</span><span class="time">18:20</span><span class="minutes">520分</span></div>
-        <div class="work-time-item"><span class="overtime">1.5H残</span><span class="time">18:50</span><span class="minutes">550分</span></div>
-        <div class="work-time-item"><span class="overtime">2.0H残</span><span class="time">19:20</span><span class="minutes">580分</span></div>
-        <div class="work-time-item"><span class="overtime">2.5H残</span><span class="time">20:00</span><span class="minutes">610分</span></div>
-        <div class="work-time-item"><span class="overtime">2.58H残</span><span class="time">20:05</span><span class="minutes">615分</span></div>
+        <div class="work-time-item"><span class="time">17:10／</span><span class="overtime">定時</span><span class="minutes">460分</span></div>
+        <div class="work-time-item"><span class="time">17:50／</span><span class="overtime">0.5H残</span><span class="minutes">490分</span></div>
+        <div class="work-time-item"><span class="time">18:20／</span><span class="overtime">1.0H残</span><span class="minutes">520分</span></div>
+        <div class="work-time-item"><span class="time">18:50／</span><span class="overtime">1.5H残</span><span class="minutes">550分</span></div>
+        <div class="work-time-item"><span class="time">19:20／</span><span class="overtime">2.0H残</span><span class="minutes">580分</span></div>
+        <div class="work-time-item"><span class="time">20:00／</span><span class="overtime">2.5H残</span><span class="minutes">610分</span></div>
+        <div class="work-time-item"><span class="time">20:15／</span><span class="overtime">2.75H残</span><span class="minutes">625分</span></div>
       </div>
     </div>
 
