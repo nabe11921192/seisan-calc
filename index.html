@@ -35,6 +35,30 @@ h1{
   font-size:24px;
   margin:0 0 6px;
 }
+.page-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.personnel-link{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:8px 11px;
+  border-radius:10px;
+  background:#1976d2;
+  color:#fff;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.25;
+  text-align:center;
+  box-shadow:0 3px 10px rgba(25,118,210,.22);
+}
+.personnel-link:active{transform:scale(.98);filter:brightness(.94)}
 .note{
   color:var(--sub);
   font-size:13px;
@@ -277,6 +301,8 @@ body.pad-open{padding-bottom:500px}
 @media(max-width:380px){
   .field-row{grid-template-columns:1fr}
   .pad-btn{height:64px}
+  h1{font-size:22px}
+  .personnel-link{font-size:11px;padding:7px 8px}
 }
 
 .time-muted {
@@ -302,7 +328,10 @@ body.pad-open{padding-bottom:500px}
 </head>
 <body>
 <div class="wrap">
-  <h1>生産出来高計算</h1>
+  <div class="page-head">
+    <h1>生産出来高計算</h1>
+    <a class="personnel-link" href="personnel.html">応援時の<br>人員算出</a>
+  </div>
   <div class="note">生産数・所要時間・停止時間・人員から自動計算します。</div>
 
   <div class="card">

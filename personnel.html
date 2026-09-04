@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#075a96">
+  <title>人工算出</title>
+  <style>
+    :root{--blue:#0867a8;--blue2:#075184;--pale:#eef7fc;--ink:#12212d;--sub:#5c6c78;--line:#c9d7e1;--white:#fff;--accent:#ef8b22;--danger:#b3261e}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{font-size:16px}
+    body{margin:0;background:linear-gradient(160deg,#e8f4fb 0,#f5f8fa 42%,#edf3f6 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
+    button,input{font:inherit}
+    .wrap{width:min(100%,720px);margin:auto;padding:14px 10px 28px}
+    .title{display:flex;align-items:center;gap:11px;margin:2px 2px 14px}
+    .mark{width:10px;height:35px;border-radius:8px;background:var(--accent)}
+    h1{font-size:1.55rem;margin:0;letter-spacing:.04em}
+    .back{margin-left:auto;display:inline-flex;align-items:center;min-height:36px;padding:7px 10px;border:1px solid #9bb5c5;border-radius:9px;background:#fff;color:#24536e;text-decoration:none;font-size:.78rem;font-weight:750;white-space:nowrap}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dbe5eb;border-radius:13px;box-shadow:0 7px 22px rgba(28,66,89,.08);overflow:hidden;margin-bottom:10px}
+    .card-head{padding:12px 16px;background:linear-gradient(100deg,var(--blue),var(--blue2));color:white;font-size:1.02rem;font-weight:700;letter-spacing:.03em}
+    .body{padding:11px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field.full{grid-column:1/-1}
+    label{font-size:.88rem;color:#3c5060;font-weight:650}
+    input{width:100%;height:44px;border:1.5px solid var(--line);border-radius:8px;background:#fff;padding:0 7px;color:var(--ink);font-size:1rem;outline:none}
+    input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(8,103,168,.12)}
+    input[type=number]{text-align:right}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;background:#e7eef3;border-radius:9px;margin:9px 0}
+    .seg button{height:36px;border:0;border-radius:7px;background:transparent;color:#48606f;font-weight:700;cursor:pointer;font-size:.9rem}
+    .seg button.active{background:white;color:var(--blue2);box-shadow:0 2px 7px rgba(26,54,70,.14)}
+    .hidden{display:none!important}
+    .result{background:linear-gradient(135deg,#064f82,#0875ba);color:#fff;padding:13px 15px;border-radius:13px;text-align:center;box-shadow:0 8px 22px rgba(5,83,137,.2)}
+    .result-label{font-size:.9rem;opacity:.9;letter-spacing:.08em}
+    .result-value{font-size:2.65rem;font-weight:800;line-height:1.12;margin:2px 0;font-variant-numeric:tabular-nums}
+    .result-value span{font-size:1.35rem;margin-left:3px}
+    .formula{font-size:.86rem;line-height:1.6;color:#dceefa}
+    .detail{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+    .detail div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:8px 6px}
+    .detail small{display:block;color:#cce4f3;margin-bottom:2px}
+    .detail strong{font-size:1.04rem}
+    .error{min-height:18px;margin:5px 2px 0;color:var(--danger);font-size:.82rem;font-weight:650}
+    .breaks{display:flex;flex-wrap:wrap;gap:7px}
+    .breaks span{padding:6px 9px;background:var(--pale);border:1px solid #d6e7f1;border-radius:8px;font-size:.78rem;color:#33566c;font-variant-numeric:tabular-nums}
+    .note{font-size:.78rem;color:var(--sub);line-height:1.5;margin:8px 1px 0}
+    .reset{width:100%;height:46px;border:1.5px solid #aebdc7;border-radius:11px;background:#fff;color:#334c5d;font-weight:700;cursor:pointer;margin-top:2px}
+    .work-table{width:100%;border-collapse:collapse;table-layout:fixed}
+    .work-table th,.work-table td{border:1px solid #aebfca;padding:6px 5px;text-align:center;vertical-align:middle}
+    .work-table thead th{background:#eaf4fa;color:#23495f;font-size:.84rem;font-weight:750}
+    .work-table thead th:first-child{width:23%}
+    .work-table tbody th{background:#f7fafb;font-size:.9rem;white-space:nowrap}
+    .work-table input{text-align:center;padding-inline:3px}
+    .minute-cell input{max-width:230px;margin:auto;text-align:center}
+    details.break-card summary{cursor:pointer;padding:11px 14px;background:#fff;color:#365669;font-weight:700;list-style:none}
+    details.break-card summary::-webkit-details-marker{display:none}
+    details.break-card summary:after{content:'＋';float:right;color:var(--blue)}
+    details.break-card[open] summary:after{content:'−'}
+    @media(max-width:390px){.work-table th,.work-table td{padding:5px 3px}.work-table thead th:first-child{width:21%}.work-table tbody th{font-size:.82rem}.work-table input{font-size:.93rem}.result-value{font-size:2.4rem}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="title"><div class="mark"></div><h1>人工算出</h1><a class="back" href="index.html">出来高計算へ戻る</a></div>
+
+    <section class="card">
+      <div class="body">
+        <table class="work-table">
+          <thead><tr><th></th><th>開始</th><th>終了</th><th>作業者数</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">正作業</th><td><input aria-label="正作業 開始" id="baseStart" type="time" value="08:25"></td><td><input aria-label="正作業 終了" id="baseEnd" type="time" value="17:10"></td><td><input aria-label="正作業者数" id="baseWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="3"></td></tr>
+            <tr id="supportRangeRow"><th scope="row">応援</th><td id="supportStartCell"><input aria-label="応援 開始" id="supportStart" type="time" value="08:25"></td><td id="supportEndCell"><input aria-label="応援 終了" id="supportEnd" type="time" value="17:10"></td><td id="supportMinutesCell" class="minute-cell hidden" colspan="2"><input id="supportMinutes" aria-label="応援実働時間（分）" type="number" inputmode="numeric" min="0" step="1" value="230" placeholder="分数を入力"></td><td><input aria-label="応援者数" id="supportWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="1"></td></tr>
+          </tbody>
+        </table>
+        <div class="seg" role="tablist" aria-label="応援時間の入力方法">
+          <button id="rangeTab" class="active" type="button" role="tab" aria-selected="true">開始・終了</button>
+          <button id="minutesTab" type="button" role="tab" aria-selected="false">実働分数</button>
+        </div>
+        <div id="error" class="error" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="result" aria-live="polite">
+      <div class="result-label">換算人員</div>
+      <div class="result-value"><b id="result">4</b><span>名</span></div>
+      <div id="formula" class="formula">3名 ＋（1名 × 460分 ÷ 460分）</div>
+      <div class="detail">
+        <div><small>正作業 実働</small><strong id="baseActual">460分</strong></div>
+        <div><small>応援 実働</small><strong id="supportActual">460分</strong></div>
+      </div>
+    </section>
+
+    <details class="card break-card" style="margin-top:10px">
+      <summary>自動で除外する休憩時間</summary>
+      <div class="body">
+        <div class="breaks" id="breakList"></div>
+        <p class="note">終了時刻が開始時刻以前の場合は、翌日の終了として計算します。応援の開始・終了入力では、休憩と重なった時間を自動で除外します。</p>
+      </div>
+    </details>
+    <button class="reset" id="reset" type="button">入力を初期値に戻す</button>
+  </main>
+
+  <script>
+    const BREAKS=[['08:15','08:25'],['10:15','10:25'],['12:15','13:00'],['15:00','15:10'],['17:10','17:20'],['19:20','19:30'],['20:15','20:25'],['22:15','22:25'],['00:15','01:00'],['03:00','03:10'],['05:10','05:20'],['07:20','07:30']];
+    const $=id=>document.getElementById(id);
+    let mode='range';
+    const mins=t=>{if(!t)return NaN;const [h,m]=t.split(':').map(Number);return h*60+m};
+    const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+
+    function elapsedWithoutBreaks(start,end){
+      let total=end-start,rest=0;
+      for(let day=-1;day<=2;day++){
+        for(const [a,b] of BREAKS){
+          let bs=mins(a)+day*1440,be=mins(b)+day*1440;if(be<=bs)be+=1440;
+          rest+=Math.max(0,Math.min(end,be)-Math.max(start,bs));
+        }
+      }
+      return Math.max(0,total-rest);
+    }
+
+    function shiftRange(){
+      const start=mins($('baseStart').value),rawEnd=mins($('baseEnd').value);
+      if(!Number.isFinite(start)||!Number.isFinite(rawEnd))return null;
+      let end=rawEnd;if(end<=start)end+=1440;
+      return {start,end};
+    }
+
+    function calculate(){
+      const shift=shiftRange(),baseWorkers=Number($('baseWorkers').value),supportWorkers=Number($('supportWorkers').value);
+      let message='';
+      if(!shift||baseWorkers<0||supportWorkers<0||!Number.isFinite(baseWorkers)||!Number.isFinite(supportWorkers))message='入力内容を確認してください。';
+      const baseActual=shift?elapsedWithoutBreaks(shift.start,shift.end):0;
+      let supportActual=0;
+      if(!message&&mode==='minutes'){
+        supportActual=Number($('supportMinutes').value);
+        if(!Number.isFinite(supportActual)||supportActual<0)message='応援実働時間を入力してください。';
+      }else if(!message){
+        let ss=mins($('supportStart').value),se=mins($('supportEnd').value);
+        if(!Number.isFinite(ss)||!Number.isFinite(se))message='応援の開始・終了時刻を入力してください。';
+        else{
+          while(ss<shift.start)ss+=1440;
+          while(se<=ss)se+=1440;
+          if(ss<shift.start||se>shift.end)message='応援時間は正作業の時間内で入力してください。';
+          else supportActual=elapsedWithoutBreaks(ss,se);
+        }
+      }
+      if(!message&&baseActual<=0)message='正作業の実働時間が0分です。時刻を確認してください。';
+      if(!message&&supportActual>baseActual)message='応援実働時間は正作業の実働時間以内で入力してください。';
+      $('error').textContent=message;
+      $('baseActual').textContent=fmt(baseActual)+'分';
+      $('supportActual').textContent=message?'—':fmt(supportActual)+'分';
+      if(message){$('result').textContent='—';$('formula').textContent='入力内容を確認すると自動計算されます';return}
+      const result=baseWorkers+(supportWorkers*supportActual/baseActual);
+      $('result').textContent=fmt(Math.round(result*100)/100);
+      $('formula').textContent=`${fmt(baseWorkers)}名 ＋（${fmt(supportWorkers)}名 × ${fmt(supportActual)}分 ÷ ${fmt(baseActual)}分）`;
+    }
+
+    function setMode(next){
+      mode=next;const range=next==='range';
+      $('rangeTab').classList.toggle('active',range);$('minutesTab').classList.toggle('active',!range);
+      $('rangeTab').setAttribute('aria-selected',range);$('minutesTab').setAttribute('aria-selected',!range);
+      $('supportStartCell').classList.toggle('hidden',!range);$('supportEndCell').classList.toggle('hidden',!range);
+      $('supportMinutesCell').classList.toggle('hidden',range);calculate();
+    }
+    BREAKS.forEach(([a,b])=>{const s=document.createElement('span');s.textContent=`${a}〜${b}`;$('breakList').appendChild(s)});
+    document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calculate));
+    $('rangeTab').addEventListener('click',()=>setMode('range'));$('minutesTab').addEventListener('click',()=>setMode('minutes'));
+    $('reset').addEventListener('click',()=>{ $('baseStart').value='08:25';$('baseEnd').value='17:10';$('baseWorkers').value='3';$('supportWorkers').value='1';$('supportStart').value='08:25';$('supportEnd').value='17:10';$('supportMinutes').value='230';setMode('range')});
+    calculate();
+  </script>
+</body>
+</html>
