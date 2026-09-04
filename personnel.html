@@ -50,6 +50,9 @@
     .work-table thead th:first-child{width:23%}
     .work-table tbody th{background:#f7fafb;font-size:.9rem;white-space:nowrap}
     .work-table input{text-align:center;padding-inline:3px}
+    .shift-select{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;margin-bottom:9px;background:#e7eef3;border-radius:9px}
+    .shift-select button{height:38px;border:0;border-radius:7px;background:transparent;color:#526977;font-weight:800;cursor:pointer}
+    .shift-select button.active{background:#fff;color:var(--blue2);box-shadow:0 2px 7px rgba(26,54,70,.14)}
     .minute-cell input{max-width:230px;margin:auto;text-align:center}
     details.break-card summary{cursor:pointer;padding:11px 14px;background:#fff;color:#365669;font-weight:700;list-style:none}
     details.break-card summary::-webkit-details-marker{display:none}
@@ -64,11 +67,15 @@
 
     <section class="card">
       <div class="body">
+        <div class="shift-select" role="group" aria-label="勤務帯">
+          <button id="dayShift" class="active" type="button">昼勤</button>
+          <button id="nightShift" type="button">夜勤</button>
+        </div>
         <table class="work-table">
           <thead><tr><th></th><th>開始</th><th>終了</th><th>作業者数</th></tr></thead>
           <tbody>
-            <tr><th scope="row">正作業</th><td><input aria-label="正作業 開始" id="baseStart" type="time" value="08:25"></td><td><input aria-label="正作業 終了" id="baseEnd" type="time" value="17:10"></td><td><input aria-label="正作業者数" id="baseWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="3"></td></tr>
-            <tr id="supportRangeRow"><th scope="row">応援</th><td id="supportStartCell"><input aria-label="応援 開始" id="supportStart" type="time" value="08:25"></td><td id="supportEndCell"><input aria-label="応援 終了" id="supportEnd" type="time" value="17:10"></td><td id="supportMinutesCell" class="minute-cell hidden" colspan="2"><input id="supportMinutes" aria-label="応援実働時間（分）" type="number" inputmode="numeric" min="0" step="1" value="230" placeholder="分数を入力"></td><td><input aria-label="応援者数" id="supportWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="1"></td></tr>
+            <tr><th scope="row">正作業者</th><td><input aria-label="正作業者 開始" id="baseStart" type="time" value="08:25"></td><td><input aria-label="正作業者 終了" id="baseEnd" type="time" value="17:10"></td><td><input aria-label="正作業者数" id="baseWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="1"></td></tr>
+            <tr id="supportRangeRow"><th scope="row">応援者</th><td id="supportStartCell"><input aria-label="応援者 開始" id="supportStart" type="time" value="08:25"></td><td id="supportEndCell"><input aria-label="応援者 終了" id="supportEnd" type="time" value="17:10"></td><td id="supportMinutesCell" class="minute-cell hidden" colspan="2"><input id="supportMinutes" aria-label="応援実働時間（分）" type="number" inputmode="numeric" min="0" step="1" value="230" placeholder="分数を入力"></td><td><input aria-label="応援者数" id="supportWorkers" type="number" inputmode="decimal" min="0" step="0.1" value="1"></td></tr>
           </tbody>
         </table>
         <div class="seg" role="tablist" aria-label="応援時間の入力方法">
@@ -161,10 +168,16 @@
       $('supportStartCell').classList.toggle('hidden',!range);$('supportEndCell').classList.toggle('hidden',!range);
       $('supportMinutesCell').classList.toggle('hidden',range);calculate();
     }
+    function setShift(type){
+      const day=type==='day',start=day?'08:25':'20:25',end=day?'17:10':'05:10';
+      $('baseStart').value=start;$('baseEnd').value=end;$('supportStart').value=start;$('supportEnd').value=end;
+      $('dayShift').classList.toggle('active',day);$('nightShift').classList.toggle('active',!day);calculate();
+    }
     BREAKS.forEach(([a,b])=>{const s=document.createElement('span');s.textContent=`${a}〜${b}`;$('breakList').appendChild(s)});
     document.querySelectorAll('input').forEach(el=>el.addEventListener('input',calculate));
     $('rangeTab').addEventListener('click',()=>setMode('range'));$('minutesTab').addEventListener('click',()=>setMode('minutes'));
-    $('reset').addEventListener('click',()=>{ $('baseStart').value='08:25';$('baseEnd').value='17:10';$('baseWorkers').value='3';$('supportWorkers').value='1';$('supportStart').value='08:25';$('supportEnd').value='17:10';$('supportMinutes').value='230';setMode('range')});
+    $('dayShift').addEventListener('click',()=>setShift('day'));$('nightShift').addEventListener('click',()=>setShift('night'));
+    $('reset').addEventListener('click',()=>{ $('baseWorkers').value='1';$('supportWorkers').value='1';$('supportMinutes').value='230';setMode('range');setShift('day')});
     calculate();
   </script>
 </body>
