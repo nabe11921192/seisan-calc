@@ -45,11 +45,12 @@
     .note{font-size:.78rem;color:var(--sub);line-height:1.5;margin:8px 1px 0}
     .reset{width:100%;height:46px;border:1.5px solid #aebdc7;border-radius:11px;background:#fff;color:#334c5d;font-weight:700;cursor:pointer;margin-top:2px}
     .work-table{width:100%;border-collapse:collapse;table-layout:fixed}
-    .work-table th,.work-table td{border:1px solid #aebfca;padding:6px 5px;text-align:center;vertical-align:middle}
+    .work-table th,.work-table td{border:1px solid #aebfca;padding:7px;text-align:center;vertical-align:middle;min-width:0}
     .work-table thead th{background:#eaf4fa;color:#23495f;font-size:.84rem;font-weight:750}
     .work-table thead th:first-child{width:23%}
     .work-table tbody th{background:#f7fafb;font-size:.9rem;white-space:nowrap}
-    .work-table input{text-align:center;padding-inline:3px}
+    .work-table input{display:block;width:100%;max-width:100%;min-width:0;margin:0;text-align:center;padding:0 3px;-webkit-appearance:none;appearance:none}
+    .work-table input::-webkit-date-and-time-value{text-align:center;padding:0}
     .shift-select{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;margin-bottom:9px;background:#e7eef3;border-radius:9px}
     .shift-select button{height:38px;border:0;border-radius:7px;background:transparent;color:#526977;font-weight:800;cursor:pointer}
     .shift-select button.active{background:#fff;color:var(--blue2);box-shadow:0 2px 7px rgba(26,54,70,.14)}
@@ -58,7 +59,7 @@
     details.break-card summary::-webkit-details-marker{display:none}
     details.break-card summary:after{content:'＋';float:right;color:var(--blue)}
     details.break-card[open] summary:after{content:'−'}
-    @media(max-width:390px){.work-table th,.work-table td{padding:5px 3px}.work-table thead th:first-child{width:21%}.work-table tbody th{font-size:.82rem}.work-table input{font-size:.93rem}.result-value{font-size:2.4rem}}
+    @media(max-width:390px){.work-table th,.work-table td{padding:6px 4px}.work-table thead th:first-child{width:22%}.work-table tbody th{font-size:.78rem}.work-table input{height:40px;font-size:.88rem}.result-value{font-size:2.4rem}}
   </style>
 </head>
 <body>
