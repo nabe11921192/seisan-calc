@@ -743,6 +743,30 @@ setNow();
   setTimeout(syncTimeDisplay, 0);
 })();
 
+
+// 生産台数・進度の電卓は同時に1つだけ表示
+(function(){
+  const pe=document.getElementById('productionEntry');
+  const ge=document.getElementById('progressEntry');
+  const pp=document.getElementById('productionPad');
+  const gp=document.getElementById('progressPad');
+
+  function only(pad){
+    if(pp) pp.hidden = (pad !== pp);
+    if(gp) gp.hidden = (pad !== gp);
+  }
+
+  if(pe && pp) pe.addEventListener('click',()=>only(pp),true);
+  if(ge && gp) ge.addEventListener('click',()=>only(gp),true);
+
+  if(pp) pp.querySelectorAll('[data-qkey="done"]').forEach(b=>
+    b.addEventListener('click',()=>{pp.hidden=true;})
+  );
+  if(gp) gp.querySelectorAll('[data-pkey="done"]').forEach(b=>
+    b.addEventListener('click',()=>{gp.hidden=true;})
+  );
+})();
+
 </script>
 </body>
 </html>
