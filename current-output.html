@@ -386,6 +386,36 @@ input{
   letter-spacing:-0.2px !important;
 }
 
+
+/* ===== iPhone時刻表示修正 ===== */
+.time-control{
+  position:relative !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:52px !important;
+  overflow:hidden !important;
+}
+.time-display{
+  width:100% !important;
+  height:52px !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+  background:#fff4cc !important;
+  color:var(--text) !important;
+  font-size:22px !important;
+  font-weight:800 !important;
+  text-align:center !important;
+}
+.native-time{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  opacity:0 !important;
+  z-index:2 !important;
+  cursor:pointer !important;
+}
+
 </style>
 </head>
 <body>
@@ -400,7 +430,10 @@ input{
     <div class="field">
       <label for="calcTime">時刻</label>
       <div class="field-row">
-        <input id="calcTime" type="time" step="60">
+        <div class="time-control">
+          <button id="timeDisplay" class="time-display" type="button">--:--</button>
+          <input id="calcTime" class="native-time" type="time" step="60">
+        </div>
         <button id="nowBtn" class="now-btn" type="button">現在時刻</button>
       </div>
     </div>
@@ -682,6 +715,32 @@ setNow();
    fire();draw();
  });
  draw();
+})();
+
+
+(function(){
+  const time=document.getElementById('calcTime');
+  const display=document.getElementById('timeDisplay');
+  if(!time || !display) return;
+
+  function syncTimeDisplay(){
+    display.textContent = time.value || '--:--';
+  }
+
+  time.addEventListener('input', syncTimeDisplay);
+  time.addEventListener('change', syncTimeDisplay);
+
+  // 既存のsetNow()で時刻がセットされた後に表示を同期
+  const originalSetNow = window.setNow;
+  if(typeof originalSetNow === 'function'){
+    window.setNow = function(){
+      originalSetNow();
+      syncTimeDisplay();
+    };
+  }
+
+  // 初期値も反映
+  setTimeout(syncTimeDisplay, 0);
 })();
 
 </script>
