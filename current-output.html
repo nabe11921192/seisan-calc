@@ -246,6 +246,97 @@ input{
   .now-btn{width:100px !important;min-width:100px !important;max-width:100px !important;font-size:12px !important}
 }
 
+
+/* ===== 時刻欄 iPhone重なり完全修正 ===== */
+.field-row{display:grid !important;grid-template-columns:1fr !important;gap:8px !important;width:100% !important}
+#calcTime{display:block !important;width:100% !important;min-width:0 !important;max-width:100% !important;box-sizing:border-box !important}
+.now-btn{display:block !important;width:100% !important;min-width:0 !important;max-width:none !important;min-height:46px !important}
+
+
+/* ===== 横並びレイアウト最終調整 ===== */
+
+/* 時刻：入力欄＋現在時刻ボタン */
+.field-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 112px !important;
+  gap:8px !important;
+  align-items:end !important;
+  width:100% !important;
+}
+.field-row > *{min-width:0 !important}
+
+#calcTime{
+  display:block !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  padding-left:6px !important;
+  padding-right:6px !important;
+  font-size:20px !important;
+}
+
+.now-btn{
+  display:block !important;
+  width:112px !important;
+  min-width:112px !important;
+  max-width:112px !important;
+  min-height:51px !important;
+  padding:0 6px !important;
+  white-space:nowrap !important;
+  font-size:13px !important;
+}
+
+/* 生産台数＋進度を横並び */
+.production-progress-row{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  align-items:start !important;
+  margin-bottom:0 !important;
+}
+.production-progress-row .field{
+  min-width:0 !important;
+  margin-bottom:0 !important;
+}
+.production-progress-row label{
+  white-space:nowrap !important;
+}
+.production-progress-row #production,
+.production-progress-row .progress-entry{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  height:52px !important;
+  box-sizing:border-box !important;
+}
+
+/* 進度テンキーは横並び欄の下で全幅表示 */
+#progressPad{
+  margin-top:10px !important;
+  margin-bottom:12px !important;
+}
+
+@media(max-width:380px){
+  .field-row{
+    grid-template-columns:minmax(0,1fr) 104px !important;
+    gap:6px !important;
+  }
+  .now-btn{
+    width:104px !important;
+    min-width:104px !important;
+    max-width:104px !important;
+    font-size:12px !important;
+  }
+  #calcTime{
+    font-size:18px !important;
+  }
+  .production-progress-row{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -265,15 +356,19 @@ input{
       </div>
     </div>
 
-    <div class="field">
+    <div class="production-progress-row">
+<div class="field">
       <label for="production">生産台数</label>
       <input id="production" type="number" inputmode="decimal" min="0" step="1" placeholder="入力">
     </div>
-
-    <div class="field">
+<div class="field">
       <label for="progress">進度</label>
       <button id="progressEntry" class="progress-entry" type="button">空欄OK</button>
       <input id="progress" type="hidden" value="">
+      <div class="progress-note">例：-9 ＝ 9個遅れ、+5 ＝ 5個進み</div>
+    </div>
+    </div>
+
       <div id="progressPad" class="progress-pad" hidden>
         <div id="progressPadDisplay" class="progress-pad-display">0</div>
         <div class="progress-pad-grid">
@@ -294,9 +389,6 @@ input{
           <button type="button" class="done" data-pkey="done" style="grid-column:span 2">決定</button>
         </div>
       </div>
-      <div class="progress-note">例：-9 ＝ 9個遅れ、+5 ＝ 5個進み</div>
-    </div>
-
     <div class="compare-wrap">
       <table class="compare-table">
         <thead>
