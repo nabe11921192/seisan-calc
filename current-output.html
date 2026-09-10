@@ -337,6 +337,55 @@ input{
   }
 }
 
+
+/* iPhone時刻欄：Safari内部UIを枠内に固定 */
+.field-row{grid-template-columns:minmax(0,1fr) 112px !important;gap:8px !important}
+#calcTime{
+  width:100% !important; min-width:0 !important; max-width:100% !important;
+  height:52px !important; box-sizing:border-box !important;
+  overflow:hidden !important; font-size:18px !important;
+}
+.now-btn{width:112px !important;min-width:112px !important;max-width:112px !important;height:52px !important}
+
+/* 生産台数を専用電卓入力に */
+.production-entry{
+  width:100%;height:52px;padding:10px 14px;text-align:left;
+  background:#fff200;border:1px solid #d9ca00;border-radius:10px;
+  font-size:22px;color:#999;
+}
+.production-entry.has-value{color:var(--text);font-weight:700}
+
+
+/* ===== 今回のレイアウト調整 ===== */
+
+/* 時刻入力欄と現在時刻ボタンを完全に半々 */
+.field-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:8px !important;
+  width:100% !important;
+}
+#calcTime,
+.now-btn{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+.now-btn{
+  height:52px !important;
+  min-height:52px !important;
+}
+
+/* 進度の例を必ず1行表示 */
+.progress-note{
+  white-space:nowrap !important;
+  word-break:keep-all !important;
+  overflow-wrap:normal !important;
+  font-size:11px !important;
+  letter-spacing:-0.2px !important;
+}
+
 </style>
 </head>
 <body>
@@ -359,7 +408,7 @@ input{
     <div class="production-progress-row">
 <div class="field">
       <label for="production">生産台数</label>
-      <input id="production" type="number" inputmode="decimal" min="0" step="1" placeholder="入力">
+      <button id="productionEntry" class="production-entry" type="button">入力</button><input id="production" type="hidden" value="">
     </div>
 <div class="field">
       <label for="progress">進度</label>
@@ -369,7 +418,16 @@ input{
     </div>
     </div>
 
-      <div id="progressPad" class="progress-pad" hidden>
+      <div id="productionPad" class="progress-pad" hidden>
+  <div id="productionPadDisplay" class="progress-pad-display">0</div>
+  <div class="progress-pad-grid">
+    <button type="button" data-qkey="7">7</button><button type="button" data-qkey="8">8</button><button type="button" data-qkey="9">9</button><button type="button" class="fn" data-qkey="back">⌫</button>
+    <button type="button" data-qkey="4">4</button><button type="button" data-qkey="5">5</button><button type="button" data-qkey="6">6</button><button type="button" class="fn" data-qkey="clear">C</button>
+    <button type="button" data-qkey="1">1</button><button type="button" data-qkey="2">2</button><button type="button" data-qkey="3">3</button><button type="button" data-qkey=".">.</button>
+    <button type="button" data-qkey="0" style="grid-column:span 2">0</button><button type="button" class="done" data-qkey="done" style="grid-column:span 2">決定</button>
+  </div>
+</div>
+<div id="progressPad" class="progress-pad" hidden>
         <div id="progressPadDisplay" class="progress-pad-display">0</div>
         <div class="progress-pad-grid">
           <button type="button" data-pkey="7">7</button>
@@ -385,7 +443,7 @@ input{
           <button type="button" data-pkey="3">3</button>
           <button type="button" class="fn" data-pkey="clear">C</button>
           <button type="button" data-pkey="0">0</button>
-          <button type="button" data-pkey="00">00</button>
+          <button type="button" data-pkey=".">.</button>
           <button type="button" class="done" data-pkey="done" style="grid-column:span 2">決定</button>
         </div>
       </div>
@@ -603,6 +661,27 @@ setNow();
     });
   });
   paint();
+})();
+
+
+(function(){
+ const h=document.getElementById('production'), e=document.getElementById('productionEntry'),
+       p=document.getElementById('productionPad'), d=document.getElementById('productionPadDisplay');
+ if(!h||!e||!p||!d)return;
+ let b='';
+ const draw=()=>{d.textContent=b||'0';e.textContent=b||'入力';e.classList.toggle('has-value',!!b)};
+ const fire=()=>{h.value=b;h.dispatchEvent(new Event('input',{bubbles:true}));h.dispatchEvent(new Event('change',{bubbles:true}))};
+ e.onclick=()=>{b=h.value||'';draw();p.hidden=false;const x=document.getElementById('progressPad');if(x)x.hidden=true};
+ p.querySelectorAll('[data-qkey]').forEach(x=>x.onclick=()=>{
+   const k=x.dataset.qkey;
+   if(/^\d$/.test(k)){b=b==='0'?k:b+k}
+   else if(k==='.'){if(!b.includes('.'))b=(b||'0')+'.'}
+   else if(k==='back')b=b.slice(0,-1);
+   else if(k==='clear')b='';
+   else if(k==='done'){fire();draw();p.hidden=true;return}
+   fire();draw();
+ });
+ draw();
 })();
 
 </script>
