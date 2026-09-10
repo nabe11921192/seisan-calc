@@ -194,6 +194,58 @@ input{
   }
 }
 
+
+/* iPhone: 時刻欄と現在時刻ボタンを重ねない */
+.field-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 108px !important;
+  gap:8px !important;
+  align-items:end !important;
+}
+.field-row > *{min-width:0 !important}
+#calcTime{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  padding-left:8px !important;
+  padding-right:8px !important;
+}
+.now-btn{
+  width:108px !important;
+  min-width:108px !important;
+  max-width:108px !important;
+  padding:0 6px !important;
+  white-space:nowrap !important;
+}
+
+/* 進度：iPhone標準数字キーボードではなく専用テンキー */
+.progress-entry{
+  width:100%;min-height:52px;padding:10px 14px;text-align:left;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  font-size:22px;color:#999;
+}
+.progress-entry.has-value{color:var(--text);font-weight:700}
+.progress-pad{
+  margin-top:10px;padding:10px;background:#111;border-radius:14px;
+}
+.progress-pad[hidden]{display:none}
+.progress-pad-display{
+  min-height:44px;padding:5px 10px 10px;color:#fff;text-align:right;
+  font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.progress-pad-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.progress-pad button{
+  min-height:48px;border:0;border-radius:24px;background:#333;color:#fff;
+  font-size:20px;font-weight:700;
+}
+.progress-pad button.fn{background:#666}
+.progress-pad button.sign{background:#1976d2}
+.progress-pad button.done{background:#ff9f0a}
+@media(max-width:360px){
+  .field-row{grid-template-columns:minmax(0,1fr) 100px !important}
+  .now-btn{width:100px !important;min-width:100px !important;max-width:100px !important;font-size:12px !important}
+}
+
 </style>
 </head>
 <body>
@@ -220,7 +272,28 @@ input{
 
     <div class="field">
       <label for="progress">進度</label>
-      <input id="progress" type="number" inputmode="numeric" step="1" placeholder="空欄OK">
+      <button id="progressEntry" class="progress-entry" type="button">空欄OK</button>
+      <input id="progress" type="hidden" value="">
+      <div id="progressPad" class="progress-pad" hidden>
+        <div id="progressPadDisplay" class="progress-pad-display">0</div>
+        <div class="progress-pad-grid">
+          <button type="button" data-pkey="7">7</button>
+          <button type="button" data-pkey="8">8</button>
+          <button type="button" data-pkey="9">9</button>
+          <button type="button" class="fn" data-pkey="back">⌫</button>
+          <button type="button" data-pkey="4">4</button>
+          <button type="button" data-pkey="5">5</button>
+          <button type="button" data-pkey="6">6</button>
+          <button type="button" class="sign" data-pkey="sign">＋/−</button>
+          <button type="button" data-pkey="1">1</button>
+          <button type="button" data-pkey="2">2</button>
+          <button type="button" data-pkey="3">3</button>
+          <button type="button" class="fn" data-pkey="clear">C</button>
+          <button type="button" data-pkey="0">0</button>
+          <button type="button" data-pkey="00">00</button>
+          <button type="button" class="done" data-pkey="done" style="grid-column:span 2">決定</button>
+        </div>
+      </div>
       <div class="progress-note">例：-9 ＝ 9個遅れ、+5 ＝ 5個進み</div>
     </div>
 
@@ -388,6 +461,58 @@ calcTime.addEventListener('input',calculate);
 production.addEventListener('input',calculate);
 progress.addEventListener('input',calculate);
 setNow();
+
+// 進度専用テンキー（マイナス入力対応）
+(function(){
+  const progress=document.getElementById('progress');
+  const entry=document.getElementById('progressEntry');
+  const pad=document.getElementById('progressPad');
+  const disp=document.getElementById('progressPadDisplay');
+  let buf='';
+
+  function paint(){
+    disp.textContent=buf || '0';
+    entry.textContent=buf || '空欄OK';
+    entry.classList.toggle('has-value',buf!=='');
+  }
+  function commit(){
+    progress.value=buf;
+    progress.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+
+  entry.addEventListener('click',()=>{
+    buf=progress.value || '';
+    paint();
+    pad.hidden=false;
+  });
+
+  pad.querySelectorAll('[data-pkey]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const k=btn.dataset.pkey;
+      if(/^\d+$/.test(k)){
+        if(buf==='0') buf=k;
+        else if(buf==='-0') buf='-'+k;
+        else buf+=k;
+      }else if(k==='sign'){
+        if(buf.startsWith('-')) buf=buf.slice(1);
+        else buf='-'+buf;
+      }else if(k==='back'){
+        buf=buf.slice(0,-1);
+      }else if(k==='clear'){
+        buf='';
+      }else if(k==='done'){
+        commit();
+        paint();
+        pad.hidden=true;
+        return;
+      }
+      commit();
+      paint();
+    });
+  });
+  paint();
+})();
+
 </script>
 </body>
 </html>
