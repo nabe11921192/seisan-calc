@@ -416,6 +416,21 @@ input{
   cursor:pointer !important;
 }
 
+
+.reset-all{
+  width:100%;
+  min-height:48px;
+  margin-top:16px;
+  border:1px solid #efb0aa;
+  border-radius:10px;
+  background:#fff2f0;
+  color:#b42318;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+.reset-all:active{background:#ffe3df}
+
 </style>
 </head>
 <body>
@@ -507,7 +522,9 @@ input{
       </table>
     </div>
 
-    <div class="formula">
+    <button id="resetAll" class="reset-all" type="button">一括リセット</button>
+
+<div class="formula">
       現時点 ＝ 生産台数から算出<br>
       目標生産数 ＝ 生産台数 − 進度<br>
       ※進度が空欄の場合は「現時点」のみ表示<br>
@@ -765,6 +782,57 @@ setNow();
   if(gp) gp.querySelectorAll('[data-pkey="done"]').forEach(b=>
     b.addEventListener('click',()=>{gp.hidden=true;})
   );
+})();
+
+
+(function(){
+  const btn=document.getElementById('resetAll');
+  if(!btn) return;
+
+  btn.addEventListener('click',()=>{
+    const production=document.getElementById('production');
+    const progress=document.getElementById('progress');
+    const productionEntry=document.getElementById('productionEntry');
+    const progressEntry=document.getElementById('progressEntry');
+    const productionPad=document.getElementById('productionPad');
+    const progressPad=document.getElementById('progressPad');
+    const time=document.getElementById('calcTime');
+
+    if(production){
+      production.value='';
+      production.dispatchEvent(new Event('input',{bubbles:true}));
+      production.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    if(progress){
+      progress.value='';
+      progress.dispatchEvent(new Event('input',{bubbles:true}));
+      progress.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+
+    if(productionEntry){
+      productionEntry.textContent='入力';
+      productionEntry.classList.remove('has-value');
+    }
+    if(progressEntry){
+      progressEntry.textContent='空欄OK';
+      progressEntry.classList.remove('has-value');
+    }
+
+    if(productionPad) productionPad.hidden=true;
+    if(progressPad) progressPad.hidden=true;
+
+    const d=new Date();
+    if(time){
+      time.value=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      time.dispatchEvent(new Event('input',{bubbles:true}));
+      time.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+
+    const timeDisplay=document.getElementById('timeDisplay');
+    if(timeDisplay && time){
+      timeDisplay.textContent=time.value;
+    }
+  });
 })();
 
 </script>
